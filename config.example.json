@@ -1,18 +1,25 @@
 {
   "_comment": "max_price is the ALL-IN dollar price per ticket. party_size must appear in a listing's purchasable lot sizes, so 1 excludes pairs-only listings. tiers lists the seat groups worth sitting in, per venue; a venue not listed here is never checked. Use \"*\" to accept every tier at a venue.",
-
   "max_price": 200,
   "party_size": 1,
   "min_drop_dollars": 10,
-
   "tiers": {
-    "Louis Armstrong": ["Courtside Reserved", "Upper"],
-    "Grandstand": ["Lower", "Suite", "Upper"],
-    "Arthur Ashe": ["Lower", "Upper"]
+    "Louis Armstrong": [
+      "Courtside Reserved",
+      "Upper"
+    ],
+    "Grandstand": [
+      "Lower",
+      "Suite",
+      "Upper"
+    ],
+    "Arthur Ashe": [
+      "Lower",
+      "Upper"
+    ]
   },
-
   "_ashe_note": "Promenade is deliberately excluded. It is the only Ashe tier ever under $200, and it is the top of a 24,000-seat stadium. Add it here if you decide cheap-and-far beats not-going.",
-
+  "imessage_to": "you@icloud.com",
   "ntfy_topic": "usopen-CHANGE-ME",
   "macos_notification": true
 }

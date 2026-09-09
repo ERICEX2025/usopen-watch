@@ -166,6 +166,24 @@ def notify(cfg, title, body, url=None, urgent=False, photo=None):
             ok = True
         except Exception as ex:
             print(f"  ntfy failed: {ex}", file=sys.stderr)
+    to = cfg.get("imessage_to")
+    if to:
+        # iMessage to yourself from the Mac: lands on the phone with nothing
+        # installed there. Messages must be signed in on this Mac.
+        text = title + "\n" + body + ("\n" + url if url else "")
+        script = (
+            'tell application "Messages"\n'
+            '  set acct to 1st account whose service type = iMessage\n'
+            f'  send {json.dumps(text, ensure_ascii=False)} to participant {json.dumps(to)} of acct\n'
+            'end tell')
+        try:
+            r = subprocess.run(["osascript", "-e", script], capture_output=True, text=True, timeout=20)
+            if r.returncode == 0:
+                ok = True
+            else:
+                print(f"  imessage failed: {r.stderr.strip()}", file=sys.stderr)
+        except Exception as ex:
+            print(f"  imessage failed: {ex}", file=sys.stderr)
     if cfg.get("macos_notification", True):
         try:
             b = body.replace('"', "'").replace("\\", "")

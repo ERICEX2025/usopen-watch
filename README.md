@@ -75,6 +75,9 @@ now attach the seat view and tapping them opens the buy page.
 - `tiers` - the seat groups worth buying, per venue. A venue absent from this
   map is never checked. `"*"` accepts every tier
 - `min_drop_dollars` - re-alert only after a further drop this large
+- `imessage_to` - optional. Your own phone number or Apple ID email. Alerts
+  are also sent as an iMessage from this Mac, which reaches the phone with
+  nothing installed there. Messages must be signed in on the Mac
 
 Ashe **Promenade is deliberately excluded**. Add it back if you decide
 cheap-and-far beats not going.
