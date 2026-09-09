@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.eko.usopenwatch</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/opt/homebrew/bin/python3</string>
+    <string>/Users/eko/usopen-watch/watch.py</string>
+  </array>
+  <key>StartInterval</key><integer>900</integer>
+  <key>RunAtLoad</key><true/>
+  <key>StandardOutPath</key><string>/Users/eko/usopen-watch/watch.log</string>
+  <key>StandardErrorPath</key><string>/Users/eko/usopen-watch/watch.err</string>
+  <key>WorkingDirectory</key><string>/Users/eko/usopen-watch</string>
+</dict>
+</plist>

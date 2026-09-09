@@ -1,0 +1,10 @@
+# local state: price history and launchd output
+*.db
+*.log
+*.err
+__pycache__/
+.DS_Store
+
+# real configs hold your ntfy topic; commit the .example.json files instead
+config.json
+tonight.json

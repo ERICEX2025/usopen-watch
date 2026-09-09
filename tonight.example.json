@@ -1,0 +1,17 @@
+{
+  "_comment": "Day-of watcher for TONIGHT: Ashe Session 22, Wed Sep 9 2026 7:30pm (Zverev v Van de Zandschulp). Two seats together, any tier, all-in cap $60 per ticket, urgent BUY NOW push at $40. Runs every 2 min via launchd job com.eko.usopenwatch.tonight until stop_after.",
+
+  "event_ids": ["68bbd44f9c69670da06669d0"],
+  "max_price": 60,
+  "instant_buy_price": 40,
+  "party_size": 2,
+  "min_drop_dollars": 5,
+
+  "tiers": { "Arthur Ashe": "*" },
+
+  "stop_after": "2026-09-10T00:30",
+  "db": "tonight.db",
+
+  "ntfy_topic": "usopen-CHANGE-ME",
+  "macos_notification": true
+}
