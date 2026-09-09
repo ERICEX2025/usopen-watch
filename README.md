@@ -64,8 +64,10 @@ remove it with
 Extra keys: `event_ids` (pin sessions, always checked even when over cap),
 `instant_buy_price` (urgent push, always fires on crossing), `stop_after`
 (local ISO time), `db` (separate history file). Pinned mode logs the floor
-price every run, so `--history` shows the trend rather than only hits. Pushes
-now attach the seat view and tapping them opens the buy page.
+price every run, so `--history` shows the trend rather than only hits. It also
+re-alerts whenever a different listing becomes the cheapest under cap, because
+on the day the cheap pairs sell within minutes. Pushes attach the seat view
+and tapping them opens the buy page.
 
 ## Tuning (config.json)
 

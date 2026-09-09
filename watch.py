@@ -135,7 +135,7 @@ def open_db(path=DB_PATH):
       event_id TEXT, ts INTEGER, cents INTEGER);
     CREATE INDEX IF NOT EXISTS price_ev ON price(event_id, ts);
     CREATE TABLE IF NOT EXISTS alerted (
-      event_id TEXT PRIMARY KEY, cents INTEGER, ts INTEGER);
+      event_id TEXT PRIMARY KEY, cents INTEGER, ts INTEGER, key TEXT);
     CREATE TABLE IF NOT EXISTS seat (
       event_id TEXT, ts INTEGER, cents INTEGER, tier TEXT, section TEXT, row TEXT);
     CREATE INDEX IF NOT EXISTS seat_ev ON seat(event_id, ts);
@@ -143,6 +143,10 @@ def open_db(path=DB_PATH):
       event_id TEXT, ts INTEGER, cents INTEGER, tier TEXT, section TEXT, row TEXT);
     CREATE INDEX IF NOT EXISTS floor_ev ON floor(event_id, ts);
     """)
+    try:
+        db.execute("ALTER TABLE alerted ADD COLUMN key TEXT")
+    except sqlite3.OperationalError:
+        pass  # column already there
     return db
 
 
@@ -255,14 +259,18 @@ def cmd_run(cfg):
         db.execute("INSERT INTO seat(event_id,ts,cents,tier,section,row) VALUES(?,?,?,?,?,?)",
                    (ev["id"], now, best["cents"], best["tier"], best["section"], best["row"]))
 
-        prev = db.execute("SELECT cents FROM alerted WHERE event_id=?", (ev["id"],)).fetchone()
-        last = prev[0] if prev else None
+        prev = db.execute("SELECT cents, key FROM alerted WHERE event_id=?", (ev["id"],)).fetchone()
+        last, last_key = (prev[0], prev[1]) if prev else (None, None)
+        key = f"{best['section']}|{best['row']}"
         urgent = instant is not None and best["cents"] <= instant
         # Crossing the instant-buy line always pages, even on a tiny drop.
         crossed = urgent and (last is None or last > instant)
-        if last is not None and best["cents"] > last - min_drop and not crossed:
+        # A different listing at the top means the last one sold: page again,
+        # since cheap pairs on the day go in minutes.
+        fresh = prev is not None and key != last_key  # None key = alerted before keys existed
+        if last is not None and best["cents"] > last - min_drop and not crossed and not fresh:
             continue
-        alerts.append((ev, best, len(hits), last, urgent))
+        alerts.append((ev, best, len(hits), last, urgent, fresh))
 
     db.commit()
     print(f"[{time.strftime('%Y-%m-%d %H:%M')}] {len(cands)} candidate sessions, "
@@ -272,9 +280,10 @@ def cmd_run(cfg):
             print(f"  floor {money(f['cents'])} {f['tier']} sec {f['section']} row {f['row']} "
                   f"({n} buyable) - {ev['venue']} {ev['when'][5:16].replace('T', ' ')}")
 
-    for ev, best, n, last, urgent in alerts:
+    for ev, best, n, last, urgent, fresh in alerts:
         when = ev["when"][:16].replace("T", " ")
         change = ("new" if last is None
+                  else "new listing" if fresh
                   else f"was {money(last)}, now {money(best['cents'])}")
         body = (f"{money(best['cents'])} - {best['tier']}, sec {best['section']} row {best['row']}\n"
                 f"{ev['venue']} - {when}\n{ev['round']}\n"
@@ -284,8 +293,8 @@ def cmd_run(cfg):
             title = "BUY NOW " + title
         print("  ALERT " + body.replace("\n", " | "))
         notify(cfg, title, body, ev["url"], urgent=urgent, photo=best["photo"] or None)
-        db.execute("INSERT OR REPLACE INTO alerted(event_id,cents,ts) VALUES(?,?,?)",
-                   (ev["id"], best["cents"], now))
+        db.execute("INSERT OR REPLACE INTO alerted(event_id,cents,ts,key) VALUES(?,?,?,?)",
+                   (ev["id"], best["cents"], now, f"{best['section']}|{best['row']}"))
     db.commit()
     db.close()
     return 0
